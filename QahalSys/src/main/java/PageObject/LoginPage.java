@@ -23,12 +23,12 @@ public class LoginPage extends BaseTest {
 
 		aguardarInteracao(By.xpath("//*[@class='login-signin']//h3[.='Acessar']"));
 		assertEquals(obterTexto(By.xpath("//*[@class='login-signin']//h3[.='Acessar']")), "Acessar");
-		assertEquals(obterTexto(By.xpath("//*[@class='login-signin']//p[.='Digite seu nome de usuário e senha']")),
-				"Digite seu nome de usuário e senha");
+		assertEquals(obterTexto(By.xpath("//*[@class='login-signin']//p[.='Digite seu nome de usuÃ¡rio e senha']")),
+				"Digite seu nome de usuÃ¡rio e senha");
 
 		assertEquals(
-				obterAtributoPlaceholder(By.xpath("//*[@id='id_sc_field_login'][@placeholder='Usuário ou Email']")),
-				"Usuário ou Email");
+				obterAtributoPlaceholder(By.xpath("//*[@id='id_sc_field_login'][@placeholder='UsuÃ¡rio ou Email']")),
+				"UsuÃ¡rio ou Email");
 		assertEquals(
 				obterAtributoPlaceholder(By.xpath("//*[@class='scFormObjectOddPwdBox']/input[@placeholder='Senha']")),
 				"Senha");
@@ -41,18 +41,18 @@ public class LoginPage extends BaseTest {
 		assertEquals(obterValorCampo("kt_login_signin_submit"), "Acessar");
 	}
 
-	public void login() throws InterruptedException {
+	public void loginAdm() throws InterruptedException {
 
-		digite(By.id("id_sc_field_login"), nomeUsuario);
+		digite(By.id("id_sc_field_login"), nomeUsuarioAdm);
 
-		digite(By.id("id_sc_field_password"), senha);
+		digite(By.id("id_sc_field_password"), senhaAdm);
 
 		clicarBotao("kt_login_signin_submit");
 
-		// Verifica se o modal de sessão ativa esta presente.
+		// Verifica se o modal de sessao ativa esta presente.
 		Boolean sessaoAtiva = getDriver().findElements(By.xpath("//*[@onclick]")).size() > 0;
 
-		// Caso a sessão esteja ativa, navega entre os botões "Cancelar" e "Continuar" e prossegue clicando em "Continuar"
+		// Caso a sessao esteja ativa, navega entre os botï¿½es "Cancelar" e "Continuar" e prossegue clicando em "Continuar"
 		if (sessaoAtiva) {
 
 			WebElement cancelar = getDriver().findElement(By.xpath("//a"));
@@ -63,8 +63,18 @@ public class LoginPage extends BaseTest {
 			Actions pressionaEnter = new Actions(getDriver()).moveToElement(continuar);
 			Thread.sleep(5000);
 			pressionaEnter.sendKeys(Keys.ENTER).perform();
+			
+			}	
 
-		} 
+		}
+		
+		public void loginErro() throws InterruptedException {
+
+			digite(By.id("id_sc_field_login"), nomeUsuarioFake);
+
+			digite(By.id("id_sc_field_password"), senhaFake);
+
+			clicarBotao("kt_login_signin_submit");
 	}
 
 }
