@@ -1,0 +1,95 @@
+package br.ce.wcaquino.tests;
+
+import static br.ce.wcaquino.utils.DataUtils.obterDataFormatada;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
+import br.ce.wcaquino.core.BaseTest;
+import br.ce.wcaquino.core.Propriedades;
+import br.ce.wcaquino.pages.MenuPage;
+import br.ce.wcaquino.pages.MovimentacaoPage;
+import br.ce.wcaquino.utils.DataUtils;
+
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class MovimentacaoTestAntigo extends BaseTest {
+	
+	private MenuPage menuPage = new MenuPage();
+	private MovimentacaoPage movPage = new MovimentacaoPage();
+	
+	@Test
+	public void test1_InserirMovimentacao() {
+		
+		menuPage.acessarTelaInserirMovimentacao();
+		
+		movPage.setDataMovimentacao(obterDataFormatada(new Date()));
+		movPage.setDataPagamento(obterDataFormatada(new Date()));
+		movPage.setDescricao("Movimentação do Teste");
+		movPage.setInteressado("Interessado Qualquer");
+		movPage.setValor("500");
+		//movPage.setConta(Propriedades.NOME_CONTA_ALTERADA);
+		movPage.setStatusPago();
+		movPage.salvar();
+		
+		assertEquals("Movimentação adicionada com sucesso!", movPage.obterMensagemSucesso());
+		
+	}
+	
+	@Test
+	public void test2_CamposObrigatorios() {
+
+		menuPage.acessarTelaInserirMovimentacao();
+		movPage.salvar();
+		
+		List<String> erros = movPage.obterErros();
+		// forma 1 de checar - A problemática é que se o erro vier numa ordem diferente, pode quebrar (dependendo do que é esperado).
+		//assertEquals("Data da Movimentação é obrigatório", erros.get(0));
+		
+		// forma 2 de checar - Aqui não importa a ordem em que apareça, desde que seja exibido.
+		//assertTrue(erros.contains("Data da Movimentação é obrigatório"));
+		
+		// forma 3 de checar - Inserindo os textos em uma única lista
+		assertTrue(erros.containsAll(Arrays.asList(
+				"Data da Movimentação é obrigatório",
+				"Data do pagamento é obrigatório",
+				"Descrição é obrigatório",
+				"Interessado é obrigatório",
+				"Valor é obrigatório",
+				"Valor deve ser um número")));
+		
+		// forma 4 de checar - Garante a quantidade de mensagens e conteúdo de erro (já conhecidas)
+		assertEquals(6, erros.size());
+		
+	}
+	
+	@Test
+	public void test3_InserirMovimentacaoFutura() {
+		
+		Date dataFutura = DataUtils.obterDataComDiferencaDias(5);
+		
+		menuPage.acessarTelaInserirMovimentacao();
+		
+		movPage.setDataMovimentacao(obterDataFormatada(dataFutura));
+		movPage.setDataPagamento(obterDataFormatada(dataFutura));
+		movPage.setDescricao("Movimentação do Teste");
+		movPage.setInteressado("Interessado Qualquer");
+		movPage.setValor("500");
+		movPage.setConta(Propriedades.NOME_CONTA_ALTERADA);
+		movPage.setStatusPago();
+		movPage.salvar();
+		
+		List<String> erros = movPage.obterErros();
+		
+		assertTrue(erros.contains("Data da Movimentação deve ser menor ou igual à data atual"));		
+		
+		assertEquals(1, erros.size());
+	}
+
+}
